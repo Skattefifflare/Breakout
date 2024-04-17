@@ -52,7 +52,7 @@ namespace Breakout {
             level1 = new Level(1);
             level1.CreateBlocks();
 
-            startButton = new MenuButton(new Vector2(100, 500), "BEGIN", font);
+            startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
             
         }
 

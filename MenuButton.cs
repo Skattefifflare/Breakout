@@ -42,6 +42,8 @@ namespace Breakout {
                             isClicked = true;
                             isVisible = false;
                         }
+                        isClicked = true;
+                        isVisible = false;
                     }
                 }
             }
