@@ -14,7 +14,13 @@ sampler2D SpriteTextureSampler = sampler_state
 	Texture = <SpriteTexture>;
 };
 
+
 float time;
+
+float R;
+float G;
+float B;
+
 bool isMagic;
 
 struct VertexShaderOutput
@@ -28,34 +34,42 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float4 col = tex2D(SpriteTextureSampler, input.TextureCoordinates) * input.Color;
 	
-    if (isMagic)
+    //if (isMagic == true)
+    //{         
+    //    float t = time % 2;
+    //    col.g = 0.9;
+    //    col.r = 1;
+    //    if (t  < 1.0)
+    //    {
+    //        col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
+    //        col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;           
+    //    }
+    //    else
+    //    {
+    //        col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
+    //        col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;                      
+    //    }        
+    //}
+
+        
+    col.r = R;
+    col.g = G * floor(input.TextureCoordinates.y * 5) / 5;
+    col.b = B;
+        
+    if (isMagic == true)
     {
-        //if (time % 2 < 1)
-        //{
-        //    col.r *= time % 2;
-        //}
-        //else
-        //{
-        //    col.r *= 2 - time % 2;
-        //}
-        
-        
-        col.r = 1;
-        col.g = col.r/2;
-        col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;
-        
-        
-        //col.rgb = time;
-        //if (input.TextureCoordinates == time % 1)
-        //{
-        //    col.r = 1;
-        //}
-    }
-    else
-    {
-        col.r *= floor(input.TextureCoordinates.x * 10) / 10;
-        col.g *= floor(input.TextureCoordinates.y * 10) / 10;
-        col.b *= floor(input.TextureCoordinates.x * 5) / 5;    
+        float t = time % 2;
+
+        if (t < 1.0)
+        {
+            col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
+            col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;
+        }
+        else
+        {
+            col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
+            col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;
+        }
     }
     
     return col;

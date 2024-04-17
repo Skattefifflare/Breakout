@@ -16,9 +16,12 @@ namespace Breakout {
         
 
         SpriteFont font;
+
         Ball ball;
         Effect blockshader;
         Level level1;
+        MenuButton startButton;
+
 
         public Game1() {
             _graphics = new GraphicsDeviceManager(this);
@@ -28,8 +31,6 @@ namespace Breakout {
 
         protected override void Initialize() {
             gd = GraphicsDevice;
-
-
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 600;
             _graphics.ApplyChanges();
@@ -45,13 +46,15 @@ namespace Breakout {
 
             font = Content.Load<SpriteFont>("font1");    
            
-            ball = new Ball(new Vector2(10, 300), new Vector2(200, 150));
-            
+
+            ball = new Ball(new Vector2(10, 300), new Vector2(300, 200));           
             blockshader = Content.Load<Effect>("blockshader");
             level1 = new Level(1);
+            level1.CreateBlocks();
+
+            startButton = new MenuButton(new Vector2(100, 500), "BEGIN", font);
             
         }
-
 
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -60,18 +63,30 @@ namespace Breakout {
             Helper.gametime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Helper.totalgametime += Helper.gametime;
 
-            ball.Update();
+            var kstate = Keyboard.GetState();
+            var mstate = Mouse.GetState();
 
-            foreach (var block in level1.blocks) {
-                if(SphereAABBCollision(ref ball, block)) {
-                    level1.blocks.Remove(block);
-                    break;
-                }
+            if (kstate.IsKeyDown(Keys.Space)) {
+                startButton.isVisible = true;
             }
+
+            startButton.Click(mstate);
+
+            ball.Update();
+            BatchCollision();
+           
 
             base.Update(gameTime);
         }
 
+        void BatchCollision() {
+            foreach (var block in level1.blocks) {
+                if (SphereAABBCollision(ref ball, block)) {
+                    level1.blocks.Remove(block);
+                    break;
+                }
+            }
+        }
         bool SphereAABBCollision(ref Ball ball, Block block) {
 
             float bax = ball.pos.X;
@@ -80,19 +95,19 @@ namespace Breakout {
             float blx = block.pos.X;
             float bly = block.pos.Y;
 
-            float blw = Block.tex.Width * block.scale.X;
-            float blh = Block.tex.Height * block.scale.Y;
+            float blw = block.tex.Width * block.scale.X;
+            float blh = block.tex.Height * block.scale.Y;
 
 
-            Vector2 clampPoint = new Vector2(Math.Clamp(bax+Ball.tex.Width/2, blx, blx+blw), Math.Clamp(bay+Ball.tex.Height/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
+            Vector2 clampPoint = new Vector2(Math.Clamp(bax+ball.tex.Width/2, blx, blx+blw), Math.Clamp(bay+ball.tex.Height/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
 
-            Vector2 ballmidpoint = new Vector2(ball.pos.X+Ball.tex.Width/2, ball.pos.Y+Ball.tex.Height/2);
+            Vector2 ballmidpoint = new Vector2(ball.pos.X+ball.tex.Width/2, ball.pos.Y+ball.tex.Height/2);
 
             Vector2 diffVec = ballmidpoint - clampPoint; // vektorn mellan bollens mittpunkt och clamppunkten
-           
+            
 
-            if (diffVec.Length() <= Ball.tex.Width/2) {
-                ball.pos -= ball.dir*Helper.gametime;
+            if (diffVec.Length() <= ball.tex.Width/2) {
+                ball.pos -= ball.dir * Helper.gametime;
                 diffVec.Normalize();
                 double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
 
@@ -113,13 +128,13 @@ namespace Breakout {
             }
             
         }
-
+        
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
-
-            ball.Draw(_spriteBatch);
-            level1.Draw(_spriteBatch, blockshader);
+            ball.Draw();
+            level1.Draw(blockshader);
+            startButton.Draw();
            
             base.Draw(gameTime);
         }
