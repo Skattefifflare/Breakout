@@ -33,23 +33,7 @@ struct VertexShaderOutput
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float4 col = tex2D(SpriteTextureSampler, input.TextureCoordinates) * input.Color;
-	
-    //if (isMagic == true)
-    //{         
-    //    float t = time % 2;
-    //    col.g = 0.9;
-    //    col.r = 1;
-    //    if (t  < 1.0)
-    //    {
-    //        col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
-    //        col.b = 1 - abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;           
-    //    }
-    //    else
-    //    {
-    //        col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.y * 10))) / 20;
-    //        col.b = abs((floor(time % 1 * 20) - floor(input.TextureCoordinates.x * 20))) / 20;                      
-    //    }        
-    //}
+
 
         
     col.r = R;

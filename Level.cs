@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace Breakout {
@@ -17,9 +18,7 @@ namespace Breakout {
         public Level(int Alevelindex) {
             levelindex = Alevelindex;
 
-            blocks = new List<Block>();
-
-            
+            blocks = new List<Block>();          
         }
 
         public void CreateBlocks() {
@@ -33,7 +32,9 @@ namespace Breakout {
                 }
             }
         }
-        
+        public void CreateBlock(float Ax, float Ay, Vector2 Ascale) {
+            blocks.Add(new Block(new Vector2(Ax, Ay), Ascale));
+        }
         public void Draw(Effect shader) {
             shader.Parameters["time"].SetValue(Helper.totalgametime);
             

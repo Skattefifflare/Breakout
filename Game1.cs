@@ -47,10 +47,11 @@ namespace Breakout {
             font = Content.Load<SpriteFont>("font1");    
            
 
-            ball = new Ball(new Vector2(10, 300), new Vector2(300, 200));           
+            ball = new Ball(new Vector2(10, 300), new Vector2(341, 220), 0.5f);           
             blockshader = Content.Load<Effect>("blockshader");
             level1 = new Level(1);
-            level1.CreateBlocks();
+            //level1.CreateBlocks();
+            level1.CreateBlock(200, 200, new Vector2 (2, 1));
 
             startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
             
@@ -99,14 +100,21 @@ namespace Breakout {
             float blh = block.tex.Height * block.scale.Y;
 
 
-            Vector2 clampPoint = new Vector2(Math.Clamp(bax+ball.tex.Width/2, blx, blx+blw), Math.Clamp(bay+ball.tex.Height/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
+            Vector2 clampPoint = new Vector2(Math.Clamp(bax+ball.tex.Width*ball.scale.X/2, blx, blx+blw), Math.Clamp(bay+ball.tex.Height*ball.scale.Y/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
 
-            Vector2 ballmidpoint = new Vector2(ball.pos.X+ball.tex.Width/2, ball.pos.Y+ball.tex.Height/2);
+            Vector2 ballmidpoint = new Vector2(ball.pos.X+ball.tex.Width*ball.scale.X/2, ball.pos.Y+ball.tex.Height*ball.scale.Y/2);
 
             Vector2 diffVec = ballmidpoint - clampPoint; // vektorn mellan bollens mittpunkt och clamppunkten
             
 
-            if (diffVec.Length() <= ball.tex.Width/2) {
+            if (diffVec.Length() <= ball.tex.Width*ball.scale.X/2) {
+
+
+                if (block.pos == new Vector2(2 * block.tex.Width * block.scale.X, 1 * block.tex.Height * block.scale.Y)) {
+                    var x = 1;
+                }
+
+
                 ball.pos -= ball.dir * Helper.gametime;
                 diffVec.Normalize();
                 double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
@@ -121,6 +129,7 @@ namespace Breakout {
                 newDir *= -1;
 
                 ball.dir = newDir *ball.dir.Length();
+               
                 return true;
             }
             else {

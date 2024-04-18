@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace Breakout {
     internal class Platform {
+
     }
 }
