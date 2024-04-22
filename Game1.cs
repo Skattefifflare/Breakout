@@ -47,17 +47,12 @@ namespace Breakout {
 
             font = Content.Load<SpriteFont>("font1");
 
-
-            //ball = new Ball(new Vector2(10, 300), new Vector2(341, 220), 0.5f);
             ball = new Ball(new Vector2(180, 400), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
             blockshader = Content.Load<Effect>("blockshader");
-            level1 = new Level(1);
-
-            level1.CreateBlocks();
-            //level1.CreateBlock(4, 6, new Vector2 (2, 1));
-
             startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
-            
+
+            level1 = new Level(1);
+            level1.CreateBlocks(); 
         }
 
         protected override void Update(GameTime gameTime) {
@@ -79,7 +74,6 @@ namespace Breakout {
             ball.Update();
             BatchCollision();
            
-
             base.Update(gameTime);
         }
 
@@ -111,13 +105,8 @@ namespace Breakout {
 
             if (diffVec.Length() <= ball.tex.Width*ball.scale.X/2) {
 
-
-                if (block.pos == new Vector2(2 * block.tex.Width * block.scale.X, 1 * block.tex.Height * block.scale.Y)) {
-                    var x = 1;
-                }
-                
-
-                ball.pos -= ball.dir * Helper.gametime;
+             
+                ball.pos -= ball.dir*1.5f * Helper.gametime;
                 diffVec.Normalize();
                 double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
 
@@ -129,14 +118,8 @@ namespace Breakout {
 
                 Vector2 newDir = new Vector2((float)Math.Cos(dirRad), (float)Math.Sin(dirRad));
                 newDir *= -1;
-
-                if (!float.IsNaN(newDir.X)) {
-                    ball.dir = newDir * ball.dir.Length();
-                }
-                else {
-                    var e = 1;
-                }
-
+                ball.dir = newDir * ball.dir.Length();
+                
                 return true;
             }
             else {
@@ -155,10 +138,6 @@ namespace Breakout {
 
             _spriteBatch.Begin();
             _spriteBatch.DrawString(font, $"{ball.dir}", new Vector2(0,0), Color.White);
-            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
-            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
-            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
-
 
             _spriteBatch.End();
             base.Draw(gameTime);

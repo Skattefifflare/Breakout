@@ -10,9 +10,10 @@ namespace Breakout {
         
         public Ball(Vector2 Apos, Vector2 Adir, float Ascale) {
             pos = Apos;
-            dir = Adir;
-            tex = Texture2D.FromFile(Game1.gd, "imgs/boll2.png");
             scale = new Vector2(Ascale, Ascale);
+            dir = Adir * scale;
+            tex = Texture2D.FromFile(Game1.gd, "imgs/boll2.png");
+            
         }
 
         public void Draw() {

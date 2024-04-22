@@ -8,17 +8,15 @@ namespace Breakout {
 
         string text;
         SpriteFont font;
+
         public bool isVisible;
         public bool isClicked;
 
         public MenuButton(Vector2 Apos, string Atext, SpriteFont Afont) { 
-            pos = Apos;
-            
-            text = Atext;
-            
+            pos = Apos;           
+            text = Atext;       
             tex = Texture2D.FromFile(Game1.gd, "imgs/block.png");
             font = Afont;
-
             scale = new Vector2((text.Length*10.5f)/tex.Width, .5f);
 
             isVisible = false;
