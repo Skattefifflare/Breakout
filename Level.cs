@@ -14,11 +14,13 @@ namespace Breakout {
     internal class Level {
         public int levelindex;
         public List<Block> blocks;
+        public Platform platform;
 
         public Level(int Alevelindex) {
             levelindex = Alevelindex;
 
-            blocks = new List<Block>();          
+            blocks = new List<Block>();
+            platform = new Platform(new Vector2(500, 400), new Vector2(4, 0.4f), 10);
         }
 
         public void CreateBlocks() {

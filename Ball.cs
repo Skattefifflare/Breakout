@@ -17,17 +17,18 @@ namespace Breakout {
 
         public void Draw() {
             sb.Begin();
-            sb.Draw(tex ,pos, null,  Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            sb.Draw(tex ,pos, null,  Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             sb.End();
         }
         
         private void WallCollision(float width, float height) {
-            if (pos.X < 0 || pos.X + tex.Width > width) {
+            if (pos.X < 0 || pos.X + tex.Width*scale.X > width) {
                 pos -= dir * Helper.gametime;
                 dir.X *= -1;
             }
-            if (pos.Y < 0 || pos.Y + tex.Height > height) {
-                dir.Y *= -1;
+            if (pos.Y < 0 || pos.Y + tex.Height*scale.Y > height) {
+                pos -= dir * Helper.gametime;
+                dir.Y *= -1;              
             }
         }
 

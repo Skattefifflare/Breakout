@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -44,14 +45,16 @@ namespace Breakout {
         protected override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            font = Content.Load<SpriteFont>("font1");    
-           
+            font = Content.Load<SpriteFont>("font1");
 
-            ball = new Ball(new Vector2(10, 300), new Vector2(341, 220), 0.5f);           
+
+            //ball = new Ball(new Vector2(10, 300), new Vector2(341, 220), 0.5f);
+            ball = new Ball(new Vector2(180, 400), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
             blockshader = Content.Load<Effect>("blockshader");
             level1 = new Level(1);
-            //level1.CreateBlocks();
-            level1.CreateBlock(200, 200, new Vector2 (2, 1));
+
+            level1.CreateBlocks();
+            //level1.CreateBlock(4, 6, new Vector2 (2, 1));
 
             startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
             
@@ -100,11 +103,10 @@ namespace Breakout {
             float blh = block.tex.Height * block.scale.Y;
 
 
-            Vector2 clampPoint = new Vector2(Math.Clamp(bax+ball.tex.Width*ball.scale.X/2, blx, blx+blw), Math.Clamp(bay+ball.tex.Height*ball.scale.Y/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
-
-            Vector2 ballmidpoint = new Vector2(ball.pos.X+ball.tex.Width*ball.scale.X/2, ball.pos.Y+ball.tex.Height*ball.scale.Y/2);
-
-            Vector2 diffVec = ballmidpoint - clampPoint; // vektorn mellan bollens mittpunkt och clamppunkten
+            Vector2 ballmidpoint = new Vector2(ball.pos.X + ball.tex.Width * ball.scale.X / 2, ball.pos.Y + ball.tex.Height * ball.scale.Y / 2);
+            ballmidpoint -= ball.dir * Helper.gametime;
+            Vector2 clampPoint = new Vector2(Math.Clamp(ballmidpoint.X, blx, blx + blw), Math.Clamp(ballmidpoint.Y, bly, bly + blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter          
+            Vector2 diffVec =  clampPoint - ballmidpoint; // vektorn mellan bollens mittpunkt och clamppunkten
             
 
             if (diffVec.Length() <= ball.tex.Width*ball.scale.X/2) {
@@ -113,7 +115,7 @@ namespace Breakout {
                 if (block.pos == new Vector2(2 * block.tex.Width * block.scale.X, 1 * block.tex.Height * block.scale.Y)) {
                     var x = 1;
                 }
-
+                
 
                 ball.pos -= ball.dir * Helper.gametime;
                 diffVec.Normalize();
@@ -128,13 +130,19 @@ namespace Breakout {
                 Vector2 newDir = new Vector2((float)Math.Cos(dirRad), (float)Math.Sin(dirRad));
                 newDir *= -1;
 
-                ball.dir = newDir *ball.dir.Length();
-               
+                if (!float.IsNaN(newDir.X)) {
+                    ball.dir = newDir * ball.dir.Length();
+                }
+                else {
+                    var e = 1;
+                }
+
                 return true;
             }
             else {
                 return false;
             }
+            
             
         }
         
@@ -144,7 +152,15 @@ namespace Breakout {
             ball.Draw();
             level1.Draw(blockshader);
             startButton.Draw();
-           
+
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, $"{ball.dir}", new Vector2(0,0), Color.White);
+            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
+            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
+            //_spriteBatch.DrawString(font, $"{ball.dir.X}", ball.pos, Color.Black);
+
+
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
