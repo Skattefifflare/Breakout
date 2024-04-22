@@ -1,15 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Breakout {
-    internal class Platform : GameObj{
+    internal class Platform : GameObj {
 
         float speed;
         float acceleration;
@@ -32,7 +26,7 @@ namespace Breakout {
             if (speed < 400) {
                 speed += acceleration;
             }
-            
+
         }
 
         public void Draw() {

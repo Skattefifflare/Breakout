@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Threading;
-using static System.Formats.Asn1.AsnWriter;
+using System.Collections.Generic;
 
 
 namespace Breakout {
@@ -25,12 +18,12 @@ namespace Breakout {
 
         public void CreateBlocks() {
             Vector2 scale = new Vector2(2f, 1f);
-            
+
             for (int i = 0; i < Helper.screenwidth / 40 * scale.X; i++) {
                 for (int j = 0; j < 6; j++) {
 
                     blocks.Add(new Block(new Vector2(i, j), scale));
-                   // Thread.Sleep(50);
+                    // Thread.Sleep(50);
                 }
             }
         }
@@ -39,16 +32,16 @@ namespace Breakout {
         }
         public void Draw(Effect shader) {
             shader.Parameters["time"].SetValue(Helper.totalgametime);
-            
-            foreach (Block block in blocks) {               
+
+            foreach (Block block in blocks) {
                 shader.Parameters["isMagic"].SetValue(block.isMagic);
-                shader.Parameters["R"].SetValue(block.RGB.Item1/255);
+                shader.Parameters["R"].SetValue(block.RGB.Item1 / 255);
                 shader.Parameters["G"].SetValue(block.RGB.Item2 / 255);
                 shader.Parameters["B"].SetValue(block.RGB.Item3 / 255);
 
                 block.Draw(shader);
-                
-            }           
+
+            }
         }
     }
 }

@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Breakout {
     public class Game1 : Game {
@@ -14,7 +10,7 @@ namespace Breakout {
 
 
         public static GraphicsDevice gd;
-        
+
 
         SpriteFont font;
 
@@ -49,15 +45,18 @@ namespace Breakout {
 
             ball = new Ball(new Vector2(180, 400), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
             blockshader = Content.Load<Effect>("blockshader");
-            startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
+            startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f); // funkar bara när x är litet
 
             level1 = new Level(1);
-            level1.CreateBlocks(); 
+            //level1.CreateBlocks();
         }
 
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+
+
 
             Helper.gametime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Helper.totalgametime += Helper.gametime;
@@ -65,15 +64,24 @@ namespace Breakout {
             var kstate = Keyboard.GetState();
             var mstate = Mouse.GetState();
 
-            if (kstate.IsKeyDown(Keys.Space)) {
-                startButton.isVisible = true;
+            if (!startButton.isClicked) {
+                startButton.Click(mstate);
+                if (startButton.isClicked) {
+                    level1.CreateBlocks();
+                }
+            }
+            else {
+
+                ball.Update();
+                BatchCollision();
+
             }
 
-            startButton.Click(mstate);
 
-            ball.Update();
-            BatchCollision();
-           
+
+
+
+
             base.Update(gameTime);
         }
 
@@ -100,13 +108,13 @@ namespace Breakout {
             Vector2 ballmidpoint = new Vector2(ball.pos.X + ball.tex.Width * ball.scale.X / 2, ball.pos.Y + ball.tex.Height * ball.scale.Y / 2);
             ballmidpoint -= ball.dir * Helper.gametime;
             Vector2 clampPoint = new Vector2(Math.Clamp(ballmidpoint.X, blx, blx + blw), Math.Clamp(ballmidpoint.Y, bly, bly + blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter          
-            Vector2 diffVec =  clampPoint - ballmidpoint; // vektorn mellan bollens mittpunkt och clamppunkten
-            
+            Vector2 diffVec = clampPoint - ballmidpoint; // vektorn mellan bollens mittpunkt och clamppunkten
 
-            if (diffVec.Length() <= ball.tex.Width*ball.scale.X/2) {
 
-             
-                ball.pos -= ball.dir*1.5f * Helper.gametime;
+            if (diffVec.Length() <= ball.tex.Width * ball.scale.X / 2) {
+
+
+                ball.pos -= ball.dir * 1.5f * Helper.gametime;
                 diffVec.Normalize();
                 double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
 
@@ -119,16 +127,16 @@ namespace Breakout {
                 Vector2 newDir = new Vector2((float)Math.Cos(dirRad), (float)Math.Sin(dirRad));
                 newDir *= -1;
                 ball.dir = newDir * ball.dir.Length();
-                
+
                 return true;
             }
             else {
                 return false;
             }
-            
-            
+
+
         }
-        
+
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
@@ -137,7 +145,7 @@ namespace Breakout {
             startButton.Draw();
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, $"{ball.dir}", new Vector2(0,0), Color.White);
+            _spriteBatch.DrawString(font, $"{ball.dir}", new Vector2(0, 0), Color.White);
 
             _spriteBatch.End();
             base.Draw(gameTime);

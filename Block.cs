@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout {
-    internal class Block : GameObj{
+    internal class Block : GameObj {
 
         public bool isMagic;
 
@@ -12,8 +11,8 @@ namespace Breakout {
         public Block(Vector2 Acoords, Vector2 Ascale) {
             tex = Texture2D.FromFile(Game1.gd, "imgs/block.png");
             scale = Ascale;
-            pos = Acoords * new Vector2(tex.Width*scale.X,tex.Height*scale.Y);
-            
+            pos = Acoords * new Vector2(tex.Width * scale.X, tex.Height * scale.Y);
+
             if (Helper.random.Next(1, 16) == 1) {
                 isMagic = true;
             }
@@ -27,6 +26,6 @@ namespace Breakout {
             sb.Begin(SpriteSortMode.Deferred, null, null, null, null, shader, null);
             sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             sb.End();
-        }       
+        }
     }
 }
