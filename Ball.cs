@@ -20,6 +20,7 @@ namespace Breakout {
             sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             sb.End();
         }
+       
 
         private void WallCollision(float width, float height) {
             if (pos.X < 0 || pos.X + tex.Width * scale.X > width) {

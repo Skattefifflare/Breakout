@@ -14,11 +14,8 @@ namespace Breakout {
 
 
         SpriteFont font;
-
         Effect blockshader;
-
-        List<Level> levels;
-        
+        List<Level> levels;        
         Level level1;
         MenuButton startButton;
 
@@ -44,21 +41,17 @@ namespace Breakout {
         protected override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            font = Content.Load<SpriteFont>("font1");
-
-            
+            font = Content.Load<SpriteFont>("font1");            
             blockshader = Content.Load<Effect>("blockshader");
-            startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f); // funkar bara när x är litet
 
+            startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f);
             level1 = new Level(1);
+            level1.LevelReader();
         }
 
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-
-
 
             Helper.gametime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Helper.totalgametime += Helper.gametime;
@@ -66,22 +59,9 @@ namespace Breakout {
             var kstate = Keyboard.GetState();
             var mstate = Mouse.GetState();
 
-            if (!startButton.isClicked) {
-                startButton.Click(mstate);
-                if (startButton.isClicked) {
-                    level1.CreateBlocks();
-                }
-            }
-            else {
-
-                level1.ball.Update();
-                BatchCollision();
-
-            }
-
-
-
-
+            
+            level1.ball.Update();
+            BatchCollision();
 
 
             base.Update(gameTime);
@@ -143,14 +123,13 @@ namespace Breakout {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
-            ball.Draw();
             level1.Draw(blockshader);
-            startButton.Draw();
+            //startButton.Draw();
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, $"{ball.dir}", new Vector2(0, 0), Color.White);
-
+            _spriteBatch.DrawString(font, $"{level1.ball.dir}", new Vector2(0, 0), Color.White);
             _spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

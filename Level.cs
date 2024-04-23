@@ -22,9 +22,10 @@ namespace Breakout {
 
             blocks = new List<Block>();
             platform = new Platform(new Vector2(500, 400), new Vector2(4, 0.4f), 10);
-            ball = new Ball(new Vector2(180, 400), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
+            ball = new Ball(new Vector2(180, 300), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
         }
 
+        /*
         public void CreateBlocks() {
             Vector2 scale = new Vector2(2f, 1f);
 
@@ -36,12 +37,14 @@ namespace Breakout {
                 }
             }
         }
+
         public void CreateBlock(float Ax, float Ay, Vector2 Ascale) {
             blocks.Add(new Block(new Vector2(Ax, Ay), Ascale));
         }
+        */
+
         public void Draw(Effect shader) {
             shader.Parameters["time"].SetValue(Helper.totalgametime);
-
             foreach (Block block in blocks) {
                 shader.Parameters["isMagic"].SetValue(block.isMagic);
                 shader.Parameters["R"].SetValue(block.RGB.Item1 / 255);
@@ -51,31 +54,34 @@ namespace Breakout {
                 block.Draw(shader);
 
             }
+
+            ball.Draw();
         }
         
-        void LevelReader() {
+        public void LevelReader() {
             string path = $"levels/level{levelindex}.txt";
-
-            //Vector2 scale = new Vector2(2f, 1f);
+            var lines = File.ReadAllLines(path);
 
             using (StreamReader sr = new StreamReader(path)) {
 
-                var t = Helper.screenwidth / sr.ReadLine().Count();
+                var neededwidth = Helper.screenwidth / lines[0].Count();
+                var scaleX = neededwidth / 40;
+                Vector2 scale = new Vector2(scaleX, scaleX/2);
 
+                
+                for (int r = 0; r < lines.Count(); r++) {
+                    if (!sr.EndOfStream) {
+                        var row = sr.ReadLine();
 
-                sr.BaseStream.Seek(0, SeekOrigin.Begin);
-
-                Vector2 scale = new Vector2(40/50, 0.5f);
-
-                for (int r = 0; r < File.ReadAllLines(path).Count(); r++) {
-                    var row = sr.ReadLine();
-                    foreach(char c in row) {
-                        if (c == '1') {
-                            blocks.Add(new Block(new Vector2(c, r), scale));
+                        int col = 0;
+                        foreach (char c in row) {
+                            if (c == '1') {
+                                blocks.Add(new Block(new Vector2(col, r), scale));
+                            }
+                            col++;
                         }
-                    }
-                }
-               
+                    } 
+                }             
             }
         }
     }
