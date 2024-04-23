@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +22,7 @@ namespace Breakout {
             levelindex = Alevelindex;
 
             blocks = new List<Block>();
-            platform = new Platform(new Vector2(500, 400), new Vector2(4, 0.4f), 10);
+            platform = new Platform(new Vector2(500, 540), new Vector2(2, 1), 20);//4, 0.4f
             ball = new Ball(new Vector2(180, 300), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
         }
 
@@ -52,10 +53,10 @@ namespace Breakout {
                 shader.Parameters["B"].SetValue(block.RGB.Item3 / 255);
 
                 block.Draw(shader);
-
             }
 
             ball.Draw();
+            platform.Draw();
         }
         
         public void LevelReader() {
@@ -83,6 +84,11 @@ namespace Breakout {
                     } 
                 }             
             }
+        }
+
+        public void Update(KeyboardState Akstate) {
+            ball.Update();
+            platform.Update(Akstate);
         }
     }
 }

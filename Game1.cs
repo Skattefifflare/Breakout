@@ -59,8 +59,7 @@ namespace Breakout {
             var kstate = Keyboard.GetState();
             var mstate = Mouse.GetState();
 
-            
-            level1.ball.Update();
+            level1.Update(kstate);
             BatchCollision();
 
 
@@ -74,9 +73,10 @@ namespace Breakout {
                     break;
                 }
             }
+            SphereAABBCollision(ref level1.ball, level1.platform);
         }
         
-        bool SphereAABBCollision(ref Ball ball, Block block) {
+        bool SphereAABBCollision(ref Ball ball, GameObj block) {
 
             float bax = ball.pos.X;
             float bay = ball.pos.Y;
@@ -88,7 +88,7 @@ namespace Breakout {
             float blh = block.tex.Height * block.scale.Y;
 
 
-            Vector2 ballmidpoint = new Vector2(ball.pos.X + ball.tex.Width * ball.scale.X / 2, ball.pos.Y + ball.tex.Height * ball.scale.Y / 2);
+            Vector2 ballmidpoint = new Vector2(bax + ball.tex.Width * ball.scale.X / 2, bay + ball.tex.Height * ball.scale.Y / 2);
             ballmidpoint -= ball.dir * Helper.gametime;
             Vector2 clampPoint = new Vector2(Math.Clamp(ballmidpoint.X, blx, blx + blw), Math.Clamp(ballmidpoint.Y, bly, bly + blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter          
             Vector2 diffVec = clampPoint - ballmidpoint; // vektorn mellan bollens mittpunkt och clamppunkten

@@ -20,17 +20,35 @@ namespace Breakout {
         }
 
         public void Update(KeyboardState Akstate) {
-            if (Akstate.IsKeyDown(Keys.Left)) {
 
-            }
-            if (speed < 400) {
+            if (speed < 600) {
                 speed += acceleration;
             }
 
+            if (Akstate.IsKeyDown(Keys.Left)) {
+                if (goingRight) {
+                    speed = 100;
+                    goingRight = false;
+                }
+                pos.X -= speed * Helper.gametime;
+            }
+
+            else if (Akstate.IsKeyDown(Keys.Right)) {
+                if (!goingRight) {
+                    speed = 100;
+                    goingRight = true;
+                }
+                pos.X += speed * Helper.gametime;
+            }
+            else {
+                speed = 100;
+            }
         }
 
         public void Draw() {
-
+            sb.Begin();
+            sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            sb.End();
         }
     }
 }
