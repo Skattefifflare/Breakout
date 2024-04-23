@@ -8,5 +8,6 @@ namespace Breakout {
         public Texture2D tex;
 
         protected SpriteBatch sb = new SpriteBatch(Game1.gd);
+
     }
 }

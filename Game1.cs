@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace Breakout {
     public class Game1 : Game {
@@ -14,8 +15,10 @@ namespace Breakout {
 
         SpriteFont font;
 
-        Ball ball;
         Effect blockshader;
+
+        List<Level> levels;
+        
         Level level1;
         MenuButton startButton;
 
@@ -43,12 +46,11 @@ namespace Breakout {
 
             font = Content.Load<SpriteFont>("font1");
 
-            ball = new Ball(new Vector2(180, 400), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
+            
             blockshader = Content.Load<Effect>("blockshader");
             startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f); // funkar bara när x är litet
 
             level1 = new Level(1);
-            //level1.CreateBlocks();
         }
 
         protected override void Update(GameTime gameTime) {
@@ -72,7 +74,7 @@ namespace Breakout {
             }
             else {
 
-                ball.Update();
+                level1.ball.Update();
                 BatchCollision();
 
             }
@@ -87,12 +89,13 @@ namespace Breakout {
 
         void BatchCollision() {
             foreach (var block in level1.blocks) {
-                if (SphereAABBCollision(ref ball, block)) {
+                if (SphereAABBCollision(ref level1.ball, block)) {
                     level1.blocks.Remove(block);
                     break;
                 }
             }
         }
+        
         bool SphereAABBCollision(ref Ball ball, Block block) {
 
             float bax = ball.pos.X;
