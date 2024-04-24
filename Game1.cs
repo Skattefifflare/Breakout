@@ -14,7 +14,7 @@ namespace Breakout {
 
 
         SpriteFont font;
-        Effect blockshader;
+        public static Effect blockshader;
         List<Level> levels;        
         Level level1;
         MenuButton startButton;
@@ -43,6 +43,7 @@ namespace Breakout {
 
             font = Content.Load<SpriteFont>("font1");            
             blockshader = Content.Load<Effect>("blockshader");
+            
 
             startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f);
             level1 = new Level(1);
@@ -73,10 +74,10 @@ namespace Breakout {
                     break;
                 }
             }
-            SphereAABBCollision(ref level1.ball, level1.platform);
+            
         }
         
-        bool SphereAABBCollision(ref Ball ball, GameObj block) {
+        bool SphereAABBCollision(ref Ball ball, Block block) {
 
             float bax = ball.pos.X;
             float bay = ball.pos.Y;
@@ -97,7 +98,7 @@ namespace Breakout {
             if (diffVec.Length() <= ball.tex.Width * ball.scale.X / 2) {
 
 
-                ball.pos -= ball.dir * 1.5f * Helper.gametime;
+                ball.pos -= ball.dir * 1.8f * Helper.gametime;
                 diffVec.Normalize();
                 double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
 
@@ -120,15 +121,16 @@ namespace Breakout {
 
         }
 
+        
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
             level1.Draw(blockshader);
             //startButton.Draw();
 
-            _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, $"{level1.ball.dir}", new Vector2(0, 0), Color.White);
-            _spriteBatch.End();
+            //_spriteBatch.Begin();
+            //_spriteBatch.DrawString(font, $"{level1.ball.dir}", new Vector2(0, 0), Color.White);
+            //_spriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -8,6 +8,8 @@ namespace Breakout {
 
         public (float, float, float) RGB;
 
+        public Effect shader;
+
         public Block(Vector2 Acoords, Vector2 Ascale) {
             tex = Texture2D.FromFile(Game1.gd, "imgs/block.png");
             scale = Ascale;
@@ -22,7 +24,7 @@ namespace Breakout {
             RGB = (Helper.random.Next(40, 256), Helper.random.Next(40, 256), Helper.random.Next(40, 256));
         }
 
-        public void Draw(Effect shader) {
+        override public void Draw() {
             sb.Begin(SpriteSortMode.Deferred, null, null, null, null, shader, null);
             sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             sb.End();

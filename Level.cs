@@ -7,42 +7,35 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using static System.Formats.Asn1.AsnWriter;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace Breakout {
     internal class Level {
         public int levelindex;
 
+        protected SpriteBatch sb = new SpriteBatch(Game1.gd);
+
+
         public List<Block> blocks;
         public Platform platform;
         public Ball ball;
 
+        public int lives;
+        public Texture2D heart;
+
+        bool doCollision;
 
         public Level(int Alevelindex) {
             levelindex = Alevelindex;
 
             blocks = new List<Block>();
-            platform = new Platform(new Vector2(500, 540), new Vector2(2, 1), 20);//4, 0.4f
-            ball = new Ball(new Vector2(180, 300), new Vector2(300, 400), 0.7f); // tot speed måste vara < 800
+
+            lives = 3;
+            heart = Texture2D.FromFile(Game1.gd, "imgs/heart.png");
+
+            doCollision = true;
         }
-
-        /*
-        public void CreateBlocks() {
-            Vector2 scale = new Vector2(2f, 1f);
-
-            for (int i = 0; i < Helper.screenwidth / 40 * scale.X; i++) {
-                for (int j = 0; j < 6; j++) {
-
-                    blocks.Add(new Block(new Vector2(i, j), scale));
-                    // Thread.Sleep(50);
-                }
-            }
-        }
-
-        public void CreateBlock(float Ax, float Ay, Vector2 Ascale) {
-            blocks.Add(new Block(new Vector2(Ax, Ay), Ascale));
-        }
-        */
 
         public void Draw(Effect shader) {
             shader.Parameters["time"].SetValue(Helper.totalgametime);
@@ -52,13 +45,31 @@ namespace Breakout {
                 shader.Parameters["G"].SetValue(block.RGB.Item2 / 255);
                 shader.Parameters["B"].SetValue(block.RGB.Item3 / 255);
 
-                block.Draw(shader);
+                block.Draw();
             }
 
             ball.Draw();
             platform.Draw();
+            sb.Begin();
+            for (int i = 0; i < lives; i++) {
+                sb.Draw(heart, new Vector2(60*i, 540), null, Color.White, -(float)(Math.PI/4), Vector2.Zero, 1.3f, SpriteEffects.None, 0f);
+            }
+            sb.End();
         }
+
         
+        void SpherePlatformCollision() {
+            if (doCollision) {
+                if (ball.pos.Y + ball.tex.Height * ball.scale.Y >= platform.pos.Y) {
+                    if (ball.pos.X + ball.tex.Width * ball.scale.X >= platform.pos.X && ball.pos.X <= platform.pos.X + platform.tex.Width * platform.scale.X) {
+                        ball.dir.Y *= -1;
+                    }
+                    else {
+                        doCollision = false;
+                    }
+                }
+            }
+        }
         public void LevelReader() {
             string path = $"levels/level{levelindex}.txt";
             var lines = File.ReadAllLines(path);
@@ -69,7 +80,9 @@ namespace Breakout {
                 var scaleX = neededwidth / 40;
                 Vector2 scale = new Vector2(scaleX, scaleX/2);
 
-                
+                platform = new Platform(new Vector2(400 - 20 * 4, 540), new Vector2(4*scaleX, 0.5f*scaleX), 20);//4, 0.4f
+                ball = new Ball(new Vector2(380, 480), new Vector2(200, 340), 0.6f*scaleX); // tot speed måste vara < 800
+
                 for (int r = 0; r < lines.Count(); r++) {
                     if (!sr.EndOfStream) {
                         var row = sr.ReadLine();
@@ -89,6 +102,16 @@ namespace Breakout {
         public void Update(KeyboardState Akstate) {
             ball.Update();
             platform.Update(Akstate);
+            SpherePlatformCollision();
+
+            if (ball.WallCollision()) {
+                lives--;
+                doCollision = true;
+                if (lives == 0) {
+                    //game over
+                }
+            }
+
         }
     }
 }

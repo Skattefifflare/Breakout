@@ -30,7 +30,7 @@ namespace Breakout {
             isClicked = false;
         }
 
-        public void Draw() {
+        override public void Draw() {
             if (isVisible) {
                 sb.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp,null, null, null, null);
                 sb.Draw(tex, boxpos, null, Color.PeachPuff, 0f, Vector2.Zero, boxscale, SpriteEffects.None, 0f);

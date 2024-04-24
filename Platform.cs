@@ -45,10 +45,16 @@ namespace Breakout {
             }
         }
 
-        public void Draw() {
-            sb.Begin();
-            sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-            sb.End();
+        //public void Draw() {
+        //    sb.Begin();
+        //    sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        //    sb.End();
+        //}
+
+
+        // gör till gemensam
+        public void Reset() {
+
         }
     }
 }
