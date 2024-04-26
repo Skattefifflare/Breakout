@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
+using System.IO;
+using System.Threading;
 
 namespace Breakout {
     public class Game1 : Game {
@@ -13,16 +12,18 @@ namespace Breakout {
 
 
         public static GraphicsDevice gd;
+        SpriteFont font;        
+        List<Level> levels;        
         
 
-        SpriteFont font;
+        private int currentLevel;
 
-        Ball ball;
-        Effect blockshader;
-        Level level1;
-        MenuButton startButton;
+        // bools for printing text
+        private bool gameStarted;
+        private bool nextLevel;
+        private bool gameWon;
 
-
+        
         public Game1() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -44,17 +45,18 @@ namespace Breakout {
         protected override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            font = Content.Load<SpriteFont>("font1");    
-           
-
-            ball = new Ball(new Vector2(10, 300), new Vector2(341, 220), 0.5f);           
-            blockshader = Content.Load<Effect>("blockshader");
-            level1 = new Level(1);
-            //level1.CreateBlocks();
-            level1.CreateBlock(200, 200, new Vector2 (2, 1));
-
-            startButton = new MenuButton(new Vector2(200, 300), "BEGIN", font); // funkar bara när x är litet
+            font = Content.Load<SpriteFont>("font1");
             
+            Helper.shader = Content.Load<Effect>("blockshader");
+            Helper.timer = 0;
+            
+            currentLevel = 0; // levelindex in list
+
+            CreateLevels();
+
+            gameStarted = false;
+            nextLevel = false;
+            gameWon = false;
         }
 
         protected override void Update(GameTime gameTime) {
@@ -68,84 +70,73 @@ namespace Breakout {
             var mstate = Mouse.GetState();
 
             if (kstate.IsKeyDown(Keys.Space)) {
-                startButton.isVisible = true;
+                gameStarted = true;
             }
 
-            startButton.Click(mstate);
+            if (gameStarted && !nextLevel && !gameWon) {
+                levels[currentLevel].Update(kstate);
 
-            ball.Update();
-            BatchCollision();
-           
+                if (levels[currentLevel].CheckWin()) {
+                    currentLevel++;
+                    if (currentLevel > levels.Count) {
+                        gameWon = true;
+                    }
+                    nextLevel = true;
+                }
+            }
+            
 
             base.Update(gameTime);
         }
 
-        void BatchCollision() {
-            foreach (var block in level1.blocks) {
-                if (SphereAABBCollision(ref ball, block)) {
-                    level1.blocks.Remove(block);
-                    break;
-                }
+        void CreateLevels() {
+            levels = new List<Level>();
+            DirectoryInfo d = new DirectoryInfo("../../../levels/");
+            int levelindex = 1;
+            foreach (var file in d.GetFiles("*.txt")) {
+                levels.Add(new Level(levelindex));
+                levelindex++;
             }
         }
-        bool SphereAABBCollision(ref Ball ball, Block block) {
 
-            float bax = ball.pos.X;
-            float bay = ball.pos.Y;
-
-            float blx = block.pos.X;
-            float bly = block.pos.Y;
-
-            float blw = block.tex.Width * block.scale.X;
-            float blh = block.tex.Height * block.scale.Y;
-
-
-            Vector2 clampPoint = new Vector2(Math.Clamp(bax+ball.tex.Width*ball.scale.X/2, blx, blx+blw), Math.Clamp(bay+ball.tex.Height*ball.scale.Y/2, bly, bly+blh)); // den närmaste punkten till bollens mittpunkt som ligger på blockets kanter
-
-            Vector2 ballmidpoint = new Vector2(ball.pos.X+ball.tex.Width*ball.scale.X/2, ball.pos.Y+ball.tex.Height*ball.scale.Y/2);
-
-            Vector2 diffVec = ballmidpoint - clampPoint; // vektorn mellan bollens mittpunkt och clamppunkten
-            
-
-            if (diffVec.Length() <= ball.tex.Width*ball.scale.X/2) {
-
-
-                if (block.pos == new Vector2(2 * block.tex.Width * block.scale.X, 1 * block.tex.Height * block.scale.Y)) {
-                    var x = 1;
-                }
-
-
-                ball.pos -= ball.dir * Helper.gametime;
-                diffVec.Normalize();
-                double diffRad = Math.Atan2(diffVec.Y, diffVec.X); // omvandla diffvektorn till radianer på enhetscirkeln
-
-                Vector2 dirVec = Vector2.Normalize(ball.dir);
-                double dirRad = Math.Atan2(dirVec.Y, dirVec.X);
-
-                double angle = Math.Abs(diffRad - dirRad);
-                dirRad += (dirRad > diffRad) ? -angle * 2 : angle * 2;
-
-                Vector2 newDir = new Vector2((float)Math.Cos(dirRad), (float)Math.Sin(dirRad));
-                newDir *= -1;
-
-                ball.dir = newDir *ball.dir.Length();
-               
-                return true;
-            }
-            else {
-                return false;
-            }
-            
-        }
-        
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
-            ball.Draw();
-            level1.Draw(blockshader);
-            startButton.Draw();
-           
+            if (!gameStarted) {
+                PrintText("PRESS 'SPACE' TO BEGIN");
+            }
+            else if (nextLevel) {
+                if (Helper.timer < 3) {
+                    PrintText("LEVEL COMPLETED!");
+                    Helper.timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else {
+                    Helper.timer = 0;
+                    nextLevel = false;
+                }
+        
+            }
+            else if (gameWon) {
+                if (Helper.timer < 5) {
+                    PrintText($"YOU WON!!!");
+                    Helper.timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else {
+                    Helper.timer = 0;
+                    Exit();
+                }                
+            }
+            else {
+                levels[currentLevel].Draw();                
+            }
+            
             base.Draw(gameTime);
+        }
+
+        private void PrintText(string text) {           
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, text, new Vector2(Helper.screenwidth / 2 - text.Length*10, Helper.screenheight / 2 - 10), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
+            _spriteBatch.End();
         }
     }
 }

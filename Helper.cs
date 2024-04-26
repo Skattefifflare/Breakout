@@ -1,14 +1,11 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Breakout {
     public static class Helper {
 
-        // flobal variables
+        // global variables
         public static float gametime;
         public static float totalgametime;
         public static float screenwidth;
@@ -16,8 +13,9 @@ namespace Breakout {
 
         public static Random random = new Random();
 
-        
+        public static Effect shader;
 
+        public static float timer;
 
     }
 }
