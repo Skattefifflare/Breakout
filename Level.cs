@@ -37,7 +37,7 @@ namespace Breakout {
 
             blocks = new List<Block>();
             platform = new Platform(new Vector2(400 - 20 * 4, 540), new Vector2(4 * scaleX, 0.3f * scaleX));//4, 0.4f
-            ball = new Ball(new Vector2(380, 480), new Vector2(200, -340), 0.6f * scaleX); // tot speed måste vara < 800
+            ball = new Ball(new Vector2(380, 440), new Vector2(200, -340), 0.6f * scaleX); // tot speed måste vara < 800
 
 
             lives = 3;
@@ -121,7 +121,9 @@ namespace Breakout {
                                 blocks.RemoveAll(block => block.pos.Y == b.pos.Y ); // powerup sweep
                                 break;
                             case 2:
-                                ball.scale *= 2f; // powerup large ball
+                                if (ball.scale.X < 2.5f) {
+                                    ball.scale *= 1.2f; // powerup large ball
+                                }                               
                                 break;
                         }
 
@@ -138,11 +140,20 @@ namespace Breakout {
                     if (ball.pos.X + ball.tex.Width * ball.scale.X >= platform.pos.X && ball.pos.X <= platform.pos.X + platform.tex.Width * platform.scale.X) {
                         
                         ball.dir.Y *= -1;
+                                                                    
+                        // allowing platform to slice the ball
+                        Vector2 normalized = Vector2.Normalize(ball.dir);
+                        double dirRadian = Math.Atan2(normalized.Y, normalized.X);
 
-                        float ballmidX = ball.pos.X + ball.tex.Width * ball.scale.X / 2;
-                        float platformmidX = platform.pos.X + platform.tex.Width*platform.scale.X / 2;
-                        float distance = Math.Abs(platformmidX - ballmidX);
+                        double change = (platform.goingRight ? platform.speed : -platform.speed) / 600;                        
+                        if (dirRadian + change < 0 && dirRadian + change > -Math.PI) {
+                            dirRadian += change;
+                        }
 
+                        Vector2 newDir = new Vector2((float)Math.Cos(dirRadian), (float)Math.Sin(dirRadian));
+
+                        newDir *= ball.dir.Length();
+                        ball.dir = newDir;
                     }
                     else {
                         doCollision = false;

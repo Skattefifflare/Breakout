@@ -10,7 +10,7 @@ namespace Breakout {
         protected SpriteBatch sb = new SpriteBatch(Game1.gd);
 
         virtual public void Draw() {
-            sb.Begin();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp);
             sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             sb.End();
         }

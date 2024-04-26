@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace Breakout {
     public class Game1 : Game {
@@ -14,8 +15,14 @@ namespace Breakout {
         SpriteFont font;        
         List<Level> levels;        
         
-        
-        int currentLevel;
+
+        private int currentLevel;
+
+        // bools for printing text
+        private bool gameStarted;
+        private bool nextLevel;
+        private bool gameWon;
+
         
         public Game1() {
             _graphics = new GraphicsDeviceManager(this);
@@ -41,10 +48,15 @@ namespace Breakout {
             font = Content.Load<SpriteFont>("font1");
             
             Helper.shader = Content.Load<Effect>("blockshader");
+            Helper.timer = 0;
             
             currentLevel = 0; // levelindex in list
 
             CreateLevels();
+
+            gameStarted = false;
+            nextLevel = false;
+            gameWon = false;
         }
 
         protected override void Update(GameTime gameTime) {
@@ -57,13 +69,22 @@ namespace Breakout {
             var kstate = Keyboard.GetState();
             var mstate = Mouse.GetState();
 
-
-            levels[currentLevel].Update(kstate);
-
-            if (levels[currentLevel].CheckWin()) {
-                currentLevel++;
-                
+            if (kstate.IsKeyDown(Keys.Space)) {
+                gameStarted = true;
             }
+
+            if (gameStarted && !nextLevel && !gameWon) {
+                levels[currentLevel].Update(kstate);
+
+                if (levels[currentLevel].CheckWin()) {
+                    currentLevel++;
+                    if (currentLevel > levels.Count) {
+                        gameWon = true;
+                    }
+                    nextLevel = true;
+                }
+            }
+            
 
             base.Update(gameTime);
         }
@@ -81,9 +102,41 @@ namespace Breakout {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
-            levels[currentLevel].Draw();
+            if (!gameStarted) {
+                PrintText("PRESS 'SPACE' TO BEGIN");
+            }
+            else if (nextLevel) {
+                if (Helper.timer < 3) {
+                    PrintText("LEVEL COMPLETED!");
+                    Helper.timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else {
+                    Helper.timer = 0;
+                    nextLevel = false;
+                }
+        
+            }
+            else if (gameWon) {
+                if (Helper.timer < 5) {
+                    PrintText($"YOU WON!!!");
+                    Helper.timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else {
+                    Helper.timer = 0;
+                    Exit();
+                }                
+            }
+            else {
+                levels[currentLevel].Draw();                
+            }
             
             base.Draw(gameTime);
+        }
+
+        private void PrintText(string text) {           
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, text, new Vector2(Helper.screenwidth / 2 - text.Length*10, Helper.screenheight / 2 - 10), Color.White, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
+            _spriteBatch.End();
         }
     }
 }

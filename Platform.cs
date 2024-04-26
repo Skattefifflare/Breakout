@@ -1,14 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace Breakout {
     internal class Platform : GameObj {
 
-        private float speed;
+        public float speed; // used for slicing the ball
         private float acceleration;
 
         private Vector2 OGpos;
+
+        public bool goingRight; // used for slicing the ball
+
+        private Keys lastKey;
+
 
         public Platform(Vector2 Apos, Vector2 Ascale) {
             pos = Apos;
@@ -26,13 +32,20 @@ namespace Breakout {
                 speed += acceleration;
             }
             if (Akstate.GetPressedKeyCount() == 0 || Akstate.GetPressedKeyCount() == 2) {
-                speed = 100;
+                speed = 0;
+            }
+            if (!Akstate.GetPressedKeys().Contains(lastKey)) {
+                speed = 0;
             }
             if (Akstate.IsKeyDown(Keys.Left)) {
                 pos.X -= speed * Helper.gametime;
+                goingRight = false;
+                lastKey = Keys.Left;
             }
             if (Akstate.IsKeyDown(Keys.Right)) {                
-                pos.X += speed * Helper.gametime;                
+                pos.X += speed * Helper.gametime;
+                goingRight = true;
+                lastKey = Keys.Right;
             }
             
             WallCollision();

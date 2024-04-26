@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Threading;
 
 namespace Breakout {
     public static class Helper {
@@ -13,6 +14,8 @@ namespace Breakout {
         public static Random random = new Random();
 
         public static Effect shader;
+
+        public static float timer;
 
     }
 }
