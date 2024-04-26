@@ -19,8 +19,7 @@ namespace Breakout {
 
         }
 
-        public void Update(KeyboardState Akstate) {
-
+        public void Update(KeyboardState Akstate) {        
             if (speed < 600) {
                 speed += acceleration;
             }
@@ -43,18 +42,21 @@ namespace Breakout {
             else {
                 speed = 100;
             }
+            WallCollision();
         }
-
-        //public void Draw() {
-        //    sb.Begin();
-        //    sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        //    sb.End();
-        //}
-
+        private void WallCollision() {
+            if (pos.X < 0) {
+                pos.X = 0;
+            }
+            if (pos.X + tex.Width * scale.X > Helper.screenwidth) {
+                pos.X = Helper.screenwidth- tex.Width*scale.X;
+            }           
+        }
+       
 
         // gör till gemensam
         public void Reset() {
-
+            //pos = OGpos;
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Breakout {
     public class Game1 : Game {
@@ -16,10 +17,12 @@ namespace Breakout {
         SpriteFont font;
         public static Effect blockshader;
         List<Level> levels;        
-        Level level1;
+        
         MenuButton startButton;
 
+        int currentLevel;
 
+        
         public Game1() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -46,8 +49,13 @@ namespace Breakout {
             
 
             startButton = new MenuButton(new Vector2(230, 300), "START GAME", font, 4f);
-            level1 = new Level(1);
-            level1.LevelReader();
+
+            currentLevel = 1;
+
+            CreateLevels();
+            levels[currentLevel].LevelReader();
+
+            
         }
 
         protected override void Update(GameTime gameTime) {
@@ -60,17 +68,34 @@ namespace Breakout {
             var kstate = Keyboard.GetState();
             var mstate = Mouse.GetState();
 
-            level1.Update(kstate);
+
+            levels[currentLevel].Update(kstate);
+
+            if (levels[currentLevel].CheckWin()) {
+                currentLevel++;
+                levels[currentLevel].LevelReader();
+            }
+
             BatchCollision();
 
 
             base.Update(gameTime);
         }
 
+        void CreateLevels() {
+            levels = new List<Level>();
+            DirectoryInfo d = new DirectoryInfo("levels/");
+            int levelindex = 0;
+            foreach (var file in d.GetFiles("*.txt")) {
+                levels.Add(new Level(levelindex));
+                levelindex++;
+            }
+        }
+
         void BatchCollision() {
-            foreach (var block in level1.blocks) {
-                if (SphereAABBCollision(ref level1.ball, block)) {
-                    level1.blocks.Remove(block);
+            foreach (var block in levels[currentLevel].blocks) {
+                if (SphereAABBCollision(ref levels[currentLevel].ball, block)) {
+                    levels[currentLevel].blocks.Remove(block);
                     break;
                 }
             }
@@ -125,7 +150,7 @@ namespace Breakout {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(new Color(39, 42, 53));
 
-            level1.Draw(blockshader);
+            levels[currentLevel].Draw(blockshader);
             //startButton.Draw();
 
             //_spriteBatch.Begin();

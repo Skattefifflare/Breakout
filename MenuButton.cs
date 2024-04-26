@@ -9,7 +9,7 @@ namespace Breakout {
         SpriteFont font;
 
         public bool isVisible;
-        public bool isClicked;
+        
 
         Vector2 boxpos;
         Vector2 boxscale;
@@ -25,9 +25,7 @@ namespace Breakout {
             boxscale = new Vector2(scale.X * 0.21f * text.Length, scale.Y / 3f);
             boxpos = new Vector2(pos.X, pos.Y + 5 *boxscale.Y);
 
-
             isVisible = true;
-            isClicked = false;
         }
 
         override public void Draw() {
@@ -39,18 +37,19 @@ namespace Breakout {
             }
         }
 
-        public void Click(MouseState Astate) {
+        public bool Click(MouseState Astate) {
             if (isVisible) {
                 if (Astate.Y > boxpos.Y && Astate.Y < boxpos.Y + tex.Height * boxscale.Y) {
                     if (Astate.X > boxpos.X && Astate.X < boxpos.X + tex.Width * boxscale.X) {
                     
-                        if (Astate.LeftButton == ButtonState.Pressed) {
-                            isClicked = true;
+                        if (Astate.LeftButton == ButtonState.Pressed) {                      
                             isVisible = false;
+                            return true;
                         }
                     }
                 }
             }
+            return false;
         }
     }
 }
