@@ -6,21 +6,25 @@ namespace Breakout {
     internal class Ball : GameObj {
 
         public Vector2 dir;
-        public Vector2 OGpos;
-        public Ball(Vector2 Apos, Vector2 Adir, float Ascale) {
+        private Vector2 OGpos;
+        private Vector2 OGdir;
+
+        private float powerTimer;
+
+        public Ball(Vector2 Apos, Vector2 Adir, float Ascale){
+            scale = new Vector2(Ascale, Ascale);
+
             pos = Apos;
             OGpos = pos;
-            scale = new Vector2(Ascale, Ascale);
+
             dir = Adir * scale;
-            tex = Texture2D.FromFile(Game1.gd, "imgs/boll2.png");
+            OGdir = dir;
 
+
+            tex = Texture2D.FromFile(Game1.gd, "../../../imgs/boll2.png");
+
+            powerTimer = 0;
         }
-
-        //public void Draw() {
-        //    sb.Begin();
-        //    sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        //    sb.End();
-        //}      
 
         public bool WallCollision() {
             
@@ -45,10 +49,13 @@ namespace Breakout {
             pos += dir * Helper.gametime;
             
         }
+
         public void Reset() {
             pos = OGpos;
+            dir = OGdir;
 
         }
 
+       
     }
 }

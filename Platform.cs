@@ -5,45 +5,39 @@ using Microsoft.Xna.Framework.Input;
 namespace Breakout {
     internal class Platform : GameObj {
 
-        float speed;
-        float acceleration;
-        bool goingRight;
+        private float speed;
+        private float acceleration;
 
-        public Platform(Vector2 Apos, Vector2 Ascale, float Aacceleration) {
+        private Vector2 OGpos;
+
+        public Platform(Vector2 Apos, Vector2 Ascale) {
             pos = Apos;
-            scale = Ascale;
-            tex = Texture2D.FromFile(Game1.gd, "imgs/block.png");
-            speed = 0;
-            acceleration = Aacceleration;
-            goingRight = false;
+            OGpos = pos;
 
+            scale = Ascale;
+            tex = Texture2D.FromFile(Game1.gd, "../../../imgs/block.png");
+            speed = 0;
+            acceleration = 20;
         }
 
-        public void Update(KeyboardState Akstate) {        
+        public void Update(KeyboardState Akstate) {
+
             if (speed < 600) {
                 speed += acceleration;
             }
-
-            if (Akstate.IsKeyDown(Keys.Left)) {
-                if (goingRight) {
-                    speed = 100;
-                    goingRight = false;
-                }
-                pos.X -= speed * Helper.gametime;
-            }
-
-            else if (Akstate.IsKeyDown(Keys.Right)) {
-                if (!goingRight) {
-                    speed = 100;
-                    goingRight = true;
-                }
-                pos.X += speed * Helper.gametime;
-            }
-            else {
+            if (Akstate.GetPressedKeyCount() == 0 || Akstate.GetPressedKeyCount() == 2) {
                 speed = 100;
             }
+            if (Akstate.IsKeyDown(Keys.Left)) {
+                pos.X -= speed * Helper.gametime;
+            }
+            if (Akstate.IsKeyDown(Keys.Right)) {                
+                pos.X += speed * Helper.gametime;                
+            }
+            
             WallCollision();
         }
+
         private void WallCollision() {
             if (pos.X < 0) {
                 pos.X = 0;
@@ -53,10 +47,9 @@ namespace Breakout {
             }           
         }
        
-
         // gör till gemensam
         public void Reset() {
-            //pos = OGpos;
+            pos = OGpos;
         }
     }
 }

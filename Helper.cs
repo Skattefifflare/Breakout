@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Breakout {
     public static class Helper {
@@ -10,6 +11,8 @@ namespace Breakout {
         public static float screenheight;
 
         public static Random random = new Random();
+
+        public static Effect shader;
 
     }
 }
